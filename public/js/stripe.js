@@ -2,9 +2,12 @@
 
 import axios from 'axios';
 import { showAlert } from './alerts';
-import keys from '../../config/keys';
+const dotenv = require('dotenv');
+dotenv.config({ path: './config.env' });
 
-const stripe = Stripe(keys.stripeKey);
+const keys = process.env.STRIPE_SECRET_KEY;
+
+const stripe = Stripe(keys);
 
 export const bookTour = async tourId => {
   try {
