@@ -1,26 +1,24 @@
-/* eslint-disable */
+//* eslint-disable */
 
-import axios from 'axios';
-import { showAlert } from './alerts';
-const dotenv = require('dotenv');
-dotenv.config({ path: './config.env' });
+ import axios from 'axios';
+ import { showAlert } from './alerts';
+ import keys from '../../config/keys';
 
-const keys = process.env.STRIPE_SECRET_KEY;
+ const stripe = Stripe(keys.stripeKey);
 
-const stripe = Stripe(keys);
+ export const bookTour = async tourId => {
+   try {
+     // 1) Get checkout session from API
+     const session = await axios(`/api/v1/bookings/checkout-session/${tourId}`);
+     // console.log(session);
 
-export const bookTour = async tourId => {
-  try {
-    // 1) Get checkout session from API
-    const session = await axios(`/api/v1/bookings/checkout-session/${tourId}`);
-    // console.log(session);
+     // 2) Create checkout form + charge credit card
+     await stripe.redirectToCheckout({
+       sessionId: session.data.session.id
+     });
+   } catch (err) {
+     console.log(err);
+     showAlert('error', err);
+   }
+ };
 
-    // 2) Create checkout form + charge credit card
-    await stripe.redirectToCheckout({
-      sessionId: session.data.session.id
-    });
-  } catch (err) {
-    console.log(err);
-    showAlert('error', err);
-  }
-};
